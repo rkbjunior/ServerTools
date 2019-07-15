@@ -1,5 +1,5 @@
 [package]
-name = "ServerTools"
+name = "server_tools"
 version = "0.1.0"
 authors = ["rkbjunior <rkbjunior@gmail.com>"]
 edition = "2018"
@@ -7,3 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rocket = "0.4.2"
+rocket_codegen = "0.4.2"
+rocket_contrib = { version = "0.4.2", default-features = false, features = ["tera_templates"] }
+winapi = "0.3.7"
+wmi = "0.4.4"
+tera = "0.11.20"
+serde = "1.0.94"
