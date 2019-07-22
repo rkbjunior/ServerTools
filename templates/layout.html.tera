@@ -3,11 +3,72 @@
 <html>
     <head>
         <meta charset="utf-8" />
+		<meta name=viewport content="width=device-width,initial-scale=1">
+		<meta http-equiv=X-UA-Compatible content="ie=edge">
+		<meta name=author content="Rick Benson">
+		<title>Server Tools</title>
+		<link rel="stylesheet" href="/scripts/css/servertools.css">
+		<script src="/scripts/js/Chart.bundle.min.js"></script>
+		<script src="/scripts/js/Chart.RadialGauge.umd.js"></script>
+		<script src="/scripts/js/utils.js"></script>
     </head>
     <body>
         <div class="container">
           <p>Check out this tera Context:</p>
-          <p>{{ my_message }}</p>
+          <p>{{ os_name }}</p>
+		  <p>{{ build }}</p>
+		  <p>{{ local_date}}</P>
+		  <p>{{ last_boot }}</p>
+		  <p>{{ comp_name }}</p>
+		  <p>{{ desc }}</p>
+		  <p id="fmem">{{ free_mem }}</p>
+		  <p>{{ installdate }}</p>
+		  <p>{{ num_of_processes }}</p>
+		  <p>{{ num_of_users }}</p>
+		  <p>{{ sku }}</p>
+		  <p>{{ architecture }}</p>
+		  <p id="tmem">{{ total_mem }}</p>
+		  <p>{{ cpu_utilization }} </p>
         </div>
+
+		<div id="gauge1">
+			<canvas id="chart-area" width="100" height="100"></canvas>
+			<script>
+				var freeMem = document.getElementById('fmem').innerHTML;
+				var totalMem = document.getElementById('tmem').innerHTML
+				Chart.defaults.global.defaultFontFamily = 'Verdana';
+
+				var config = {
+					type: 'radialGauge',
+					data: {
+						labels: ['Memory Usage'],
+						datasets: [ {
+							data: [freeMem],
+							backgroundColor: [Samples.utils.transparentize(window.chartColors.blue, 0.5)],
+							label: 'Score',
+							borderWidth: 0
+						} ]
+					},
+					options: {
+						responsive: true,
+						domain: [0, totalMem],
+						legend: {},
+						title: {
+							display: true,
+							text: 'Memory Usage'
+						},
+						centerArea: {
+							fontColor: '#fff',
+							backgroundColor: 'rgba(0,0,0,0.6)'
+						}
+					}
+				};
+
+				window.onload = function() {
+					var ctx = document.getElementById('chart-area').getContext('2d');
+					window.myRadialGauge = new Chart(ctx, config);
+				};
+			</script>
+		</div>
     </body>
 </html>
