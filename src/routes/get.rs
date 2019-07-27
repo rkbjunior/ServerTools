@@ -3,6 +3,8 @@ use tera::Context;
 use wmi::{COMLibrary, WMIConnection};
 use serde::Deserialize;
 use wmi::WMIDateTime;
+use wmi::Variant;
+use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename = "Win32_OperatingSystem")]
@@ -42,7 +44,7 @@ fn convert_bytes_string_to_gigabytes_string(byte_string: String) -> String {
 
 	gigabytes /= GIGACONVERSION;
 
-	format!("{:.*}",2,gigabytes.to_string())
+	format!("{:.*}",4,gigabytes.to_string())
 }
 
 #[get("/")]

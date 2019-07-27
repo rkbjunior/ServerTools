@@ -15,20 +15,20 @@
     <body>
         <div class="container">
           <p>Check out this tera Context:</p>
-          <p>{{ os_name }}</p>
-		  <p>{{ build }}</p>
-		  <p>{{ local_date}}</P>
-		  <p>{{ last_boot }}</p>
-		  <p>{{ comp_name }}</p>
-		  <p>{{ desc }}</p>
-		  <p id="fmem">{{ free_mem }}</p>
-		  <p>{{ installdate }}</p>
-		  <p>{{ num_of_processes }}</p>
-		  <p>{{ num_of_users }}</p>
-		  <p>{{ sku }}</p>
-		  <p>{{ architecture }}</p>
-		  <p id="tmem">{{ total_mem }}</p>
-		  <p>{{ cpu_utilization }} </p>
+          <p>OS Name:       {{ os_name }}</p>
+		  <p>OS Build:      {{ build }}</p>
+		  <p>Local Date:    {{ local_date}}</P>
+		  <p>Last Boot:     {{ last_boot }}</p>
+		  <p>Computer Name: {{ comp_name }}</p>
+		  <p>Description:   {{ desc }}</p>
+		  <p id="fmem">Free Memory:  {{ free_mem }}</p>
+		  <p>Install Date: {{ installdate }}</p>
+		  <p>Number of Processes: {{ num_of_processes }}</p>
+		  <p>Number of Users: {{ num_of_users }}</p>
+		  <p>SKU: {{ sku }}</p>
+		  <p>Architecture: {{ architecture }}</p>
+		  <p id="tmem"> Total Memory: {{ total_mem }}</p>
+		  <p>CPU Utilization: {{ cpu_utilization }} </p>
         </div>
 
 		<div id="gauge1">

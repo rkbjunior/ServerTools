@@ -7,10 +7,25 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Rocket web server
 rocket = "0.4.2"
 rocket_codegen = "0.4.2"
 rocket_contrib = { version = "0.4.2", default-features = false, features = ["tera_templates"] }
+
+# Windows API and interfaces
 winapi = "0.3.7"
-wmi = "0.4.4"
+# wmi = "0.4.4"
+wmi = { version = "0.4.4", path = "../wmi" }
+
+# database
+diesel = { version = "0.16", features = ["postgres"] }
+diesel_codegen = { version = "0.16", features = ["postgres"] }
+r2d2 = "*"
+r2d2-diesel = "*"
+
+# other dependencies
 tera = "0.11.20"
 serde = "1.0.94"
+serde_derive = "1.0.11"
+serde_json = "1.0.2"
+dotenv = "0.10"
