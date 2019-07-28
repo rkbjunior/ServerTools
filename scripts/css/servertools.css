@@ -28,3 +28,18 @@
     width: 250px;
     height: 250px;
 }
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 2px;
+}
+
+.one {
+    width: 35%;
+    float: left;
+}
+
+.two {
+    margin-left: 35%;
+}

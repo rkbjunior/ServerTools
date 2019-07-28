@@ -17,22 +17,47 @@
     <body>
 		<div class="row">
 			<div class="column">
-			  <p>Check out this tera Context:</p>
-			  <p>OS Name:       {{ os_name }}</p>
-			  <p>OS Build:      {{ build }}</p>
-			  <p>Local Date:    {{ local_date}}</P>
-			  <p>Last Boot:     {{ last_boot }}</p>
-			  <p>Computer Name: {{ comp_name }}</p>
-			  <p>Description:   {{ desc }}</p>
-			  <p>Free Memory: <span id="fmem">{{ free_mem }}</span></p>
-			  <p>Memory used: <span id="umem">{{ used_mem }}</span></p>
-			  <p>Install Date: {{ installdate }}</p>
-			  <p>Number of Processes: {{ num_of_processes }}</p>
-			  <p>Number of Users: {{ num_of_users }}</p>
-			  <p>SKU: {{ sku }}</p>
-			  <p>Architecture: {{ architecture }}</p>
-			  <p>Total Memory: <span id="tmem">{{ total_mem }}</span></p>
-			  <p>CPU Utilization: <span id="cpu">{{ cpu_utilization }}</span></p>
+				<section class="container">
+				<div>
+					<h1>{{comp_name}}</h1>
+					<hr>
+				</div>
+				</section>
+				<section class="container">
+					<div>
+						<p><b>OS Name:</b><br>{{ os_name }}</p>
+					</div>
+				</section>
+				<section class="container">
+					<div class="one">
+						<p><b>OS Build:</b><br>{{ build }}</p>
+					</div>
+					<div class="two">
+						<p><b>Architecture:</b><br>{{ architecture }}</p>
+					</div>
+				</section>
+				<section class="container">
+					<div>
+						<p><b>Install Date:</b><br>{{ installdate }}</p>
+					</div>
+				</section>
+				<section class="container">
+				<div>
+					<p><b>Last Boot:</b><br>{{ last_boot }}</p>
+				</div>
+				</section>
+				<div>
+					<p><b>Free Memory:</b><br> <span id="fmem">{{ free_mem }}</span></p>
+				</div>
+				<div>
+					<p><b>Memory used:</b><br> <span id="umem">{{ used_mem }}</span></p>
+				</div>
+				<div>
+				  <p><b>Total Memory:</b><br> <span id="tmem">{{ total_mem }}</span></p>
+				</div>
+				<div>
+				  <p><b>CPU Utilization:</b><br> <span id="cpu">{{ cpu_utilization }}</span></p>
+				</div>
 			</div>
 
 			<div id="gauge1" class="column">

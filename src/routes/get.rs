@@ -95,31 +95,47 @@ pub fn index() -> Template {
 
 	let com_con = COMLibrary::new().unwrap();
 	let wmi_con = WMIConnection::new(com_con.into()).unwrap();
+	let mut osinfo: Vec<OperatingSystem> = Vec::new();
+	let mut cpuinfo: Vec<ProcessUtilization> = Vec::new();
 
-	let results: Vec<OperatingSystem> = wmi_con.query().unwrap();
-	let cpu: Vec<ProcessUtilization> = wmi_con.query().unwrap();
+	//let results: Vec<OperatingSystem> = wmi_con.query();
+	let osresults = wmi_con.query();
+	let cpuresults = wmi_con.query();
+
+	if osresults.is_ok() {
+		osinfo = osresults.unwrap()
+	} else {
+		println!("WMI OS Query Failed.");
+	}
+
+	if cpuresults.is_ok() {
+		cpuinfo = cpuresults.unwrap();
+	} else {
+		println!("WMI CPU Query Failed.");
+	}
+	
 
 	let mut context = Context::new();
 
-	let freemem = convert_bytes_string_to_gigabytes_float( results[0].freephysicalmemory.clone(), 2.0, "GB".to_string());
-	let totalmem = convert_bytes_string_to_gigabytes_float( results[0].total_visible_memory_size.clone(), 2.0, "GB".to_string());
+	let freemem = convert_bytes_string_to_gigabytes_float( osinfo[0].freephysicalmemory.clone(), 2.0, "GB".to_string());
+	let totalmem = convert_bytes_string_to_gigabytes_float( osinfo[0].total_visible_memory_size.clone(), 2.0, "GB".to_string());
 	let usedmem = totalmem - freemem;
 
-	context.insert("os_name", &results[0].caption);
-	context.insert("build", &results[0].buildnumber);
-	context.insert("local_date", &results[0].localdatetime);
-	context.insert("last_boot", &results[0].last_boot_up_time);
-	context.insert("comp_name", &results[0].csname);
-	context.insert("desc", &results[0].description);
+	context.insert("os_name", &osinfo[0].caption);
+	context.insert("build", &osinfo[0].buildnumber);
+	context.insert("local_date", &osinfo[0].localdatetime);
+	context.insert("last_boot", &osinfo[0].last_boot_up_time);
+	context.insert("comp_name", &osinfo[0].csname);
+	context.insert("desc", &osinfo[0].description);
 	context.insert("free_mem", &freemem);
 	context.insert("used_mem", &usedmem);
-	context.insert("installdate", &results[0].installdate);
-	context.insert("num_of_processes", &results[0].numberofprocesses);
-	context.insert("num_of_users", &results[0].numberofusers);
-	context.insert("sku", &results[0].operatingsystemsku);
-	context.insert("architecture", &results[0].osarchitecture);
+	context.insert("installdate", &osinfo[0].installdate);
+	context.insert("num_of_processes", &osinfo[0].numberofprocesses);
+	context.insert("num_of_users", &osinfo[0].numberofusers);
+	context.insert("sku", &osinfo[0].operatingsystemsku);
+	context.insert("architecture", &osinfo[0].osarchitecture);
 	context.insert("total_mem", &totalmem);
-	context.insert("cpu_utilization", &cpu[0].percent_processor_time);
+	context.insert("cpu_utilization", &cpuinfo[0].percent_processor_time);
 
 	Template::render("layout", &context)
 	

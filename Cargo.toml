@@ -4,7 +4,17 @@ version = "0.1.0"
 authors = ["rkbjunior <rkbjunior@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "main"
+path = "src/main.rs"
+
+[[bin]]
+name = "seed"
+path = "src/seed.rs"
+
+[lib]
+name = "lib"
+path = "src/lib.rs"
 
 [dependencies]
 # Rocket web server
@@ -18,14 +28,21 @@ winapi = "0.3.7"
 wmi = { version = "0.4.4", path = "../wmi" }
 
 # database
-diesel = { version = "0.16", features = ["postgres"] }
-diesel_codegen = { version = "0.16", features = ["postgres"] }
-r2d2 = "*"
-r2d2-diesel = "*"
+diesel = { version = "1.4.2", features = ["postgres"] }
+#diesel_codegen = { version = "0.16.1", features = ["postgres"] }
+diesel_infer_schema = { version = "1.4.0", features = ["postgres"] }
 
-# other dependencies
+#connection pooling
+r2d2 = "0.8.5"
+r2d2-diesel = "1.0.0"
+
+# template engine
 tera = "0.11.20"
-serde = "1.0.94"
-serde_derive = "1.0.11"
-serde_json = "1.0.2"
-dotenv = "0.10"
+
+# Serialization/deserialization crate
+serde = "1.0.97"
+serde_derive = "1.0.97"
+serde_json = "1.0.40"
+
+#environment variable crate
+dotenv = "0.10.1"
