@@ -8,67 +8,105 @@
 		<meta name=author content="Rick Benson">
 		<title>Server Tools</title>
 		<link rel="stylesheet" href="/scripts/css/servertools.css">
+		<link rel="icon" href="../favicon.ico">
 		<script src="/scripts/js/Chart.bundle.min.js"></script>
 		<script src="/scripts/js/Chart.RadialGauge.umd.js"></script>
 		<script src="/scripts/js/utils.js"></script>
+
     </head>
     <body>
-        <div class="container">
-          <p>Check out this tera Context:</p>
-          <p>OS Name:       {{ os_name }}</p>
-		  <p>OS Build:      {{ build }}</p>
-		  <p>Local Date:    {{ local_date}}</P>
-		  <p>Last Boot:     {{ last_boot }}</p>
-		  <p>Computer Name: {{ comp_name }}</p>
-		  <p>Description:   {{ desc }}</p>
-		  <p id="fmem">Free Memory:  {{ free_mem }}</p>
-		  <p>Install Date: {{ installdate }}</p>
-		  <p>Number of Processes: {{ num_of_processes }}</p>
-		  <p>Number of Users: {{ num_of_users }}</p>
-		  <p>SKU: {{ sku }}</p>
-		  <p>Architecture: {{ architecture }}</p>
-		  <p id="tmem"> Total Memory: {{ total_mem }}</p>
-		  <p>CPU Utilization: {{ cpu_utilization }} </p>
-        </div>
+		<div class="row">
+			<div class="column">
+			  <p>Check out this tera Context:</p>
+			  <p>OS Name:       {{ os_name }}</p>
+			  <p>OS Build:      {{ build }}</p>
+			  <p>Local Date:    {{ local_date}}</P>
+			  <p>Last Boot:     {{ last_boot }}</p>
+			  <p>Computer Name: {{ comp_name }}</p>
+			  <p>Description:   {{ desc }}</p>
+			  <p>Free Memory: <span id="fmem">{{ free_mem }}</span></p>
+			  <p>Memory used: <span id="umem">{{ used_mem }}</span></p>
+			  <p>Install Date: {{ installdate }}</p>
+			  <p>Number of Processes: {{ num_of_processes }}</p>
+			  <p>Number of Users: {{ num_of_users }}</p>
+			  <p>SKU: {{ sku }}</p>
+			  <p>Architecture: {{ architecture }}</p>
+			  <p>Total Memory: <span id="tmem">{{ total_mem }}</span></p>
+			  <p>CPU Utilization: <span id="cpu">{{ cpu_utilization }}</span></p>
+			</div>
 
-		<div id="gauge1">
-			<canvas id="chart-area" width="100" height="100"></canvas>
-			<script>
-				var freeMem = document.getElementById('fmem').innerHTML;
-				var totalMem = document.getElementById('tmem').innerHTML
-				Chart.defaults.global.defaultFontFamily = 'Verdana';
-
-				var config = {
-					type: 'radialGauge',
-					data: {
-						labels: ['Memory Usage'],
-						datasets: [ {
-							data: [freeMem],
-							backgroundColor: [Samples.utils.transparentize(window.chartColors.blue, 0.5)],
-							label: 'Score',
-							borderWidth: 0
-						} ]
-					},
-					options: {
-						responsive: true,
-						domain: [0, totalMem],
-						legend: {},
-						title: {
-							display: true,
-							text: 'Memory Usage'
-						},
-						centerArea: {
-							fontColor: '#fff',
-							backgroundColor: 'rgba(0,0,0,0.6)'
-						}
-					}
-				};
-
-				window.onload = function() {
-					var ctx = document.getElementById('chart-area').getContext('2d');
-					window.myRadialGauge = new Chart(ctx, config);
-				};
-			</script>
+			<div id="gauge1" class="column">
+				<p><canvas id="mem-chart" width="100" height="100"></canvas></p>
+				<p><canvas id="cpu-chart" width="100" height="100"></canvas></p>
+			</div>
 		</div>
+
+		<script>
+			var freeMem = document.getElementById('fmem').innerHTML;
+			var totalMem = document.getElementById('tmem').innerHTML;
+			var usedMem = document.getElementById('umem').innerHTML;
+			var cpuu = document.getElementById('cpu').innerHTML;
+			Chart.defaults.global.defaultFontFamily = 'Verdana';
+
+			var config1 = {
+				type: 'radialGauge',
+				data: {
+					labels: ['CPU Usage'],
+					datasets: [ {
+						data: [cpuu],
+						backgroundColor: [Samples.utils.transparentize(window.chartColors.blue, 0.5)],
+						label: 'Score',
+						borderWidth: 0
+					} ]
+				},
+				options: {
+					responsive: true,
+					domain: [0, 100],
+					legend: {},
+					title: {
+						display: true,
+						text: 'CPU Usage'
+					},
+					centerArea: {
+						fontColor: '#fff',
+						backgroundColor: 'rgba(0,0,0,0.6)'
+					}
+				}
+			};
+
+			var config2 = {
+				type: 'radialGauge',
+				data: {
+					labels: ['Memory Usage'],
+					datasets: [ {
+						data: [usedMem],
+						backgroundColor: [Samples.utils.transparentize(window.chartColors.blue, 0.5)],
+						label: 'Score',
+						borderWidth: 0
+					} ]
+				},
+				options: {
+					responsive: true,
+					domain: [0, totalMem],
+					legend: {},
+					title: {
+						display: true,
+						text: 'Memory Usage'
+					},
+					centerArea: {
+						fontColor: '#fff',
+						backgroundColor: 'rgba(0,0,0,0.6)'
+					}
+				}
+			};
+
+			window.onload = function() {
+				var ctx1 = document.getElementById('cpu-chart').getContext('2d');
+				var ctx2 = document.getElementById('mem-chart').getContext('2d');
+				window.myRadialGauge1 = new Chart(ctx1, config1);
+				window.myRadialGauge2 = new Chart(ctx2, config2);
+			};
+		</script>
+		<script src="/scripts/js/main.js"></script>
     </body>
 </html>
