@@ -5,9 +5,8 @@
 /* Create two equal columns that floats next to each other */
 .column {
     float: left;
-    width: 40%;
+    width: 20%;
     padding: 10px;
-    height: 300px; /* Should be removed. Only for demonstration */
 }
 
 /* Clear floats after the columns */
@@ -36,10 +35,10 @@
 }
 
 .one {
-    width: 35%;
+    width: 40%;
     float: left;
 }
 
 .two {
-    margin-left: 35%;
+    margin-left: 40%;
 }

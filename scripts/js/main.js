@@ -12,7 +12,7 @@ setInterval(function () {
     };
     ourRequest.send();
 
-}, 10000);
+}, 1500);
 
 function renderHTML(data) {
     free_memory.innerHTML = data.freemem;

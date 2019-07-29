@@ -14,5 +14,5 @@ use crate::routes::{scripts, get };
 use rocket_contrib::templates::Template;
 
 fn main() {
-    rocket::ignite().mount("/", routes![scripts::file,get::index,get::stats]).attach(Template::fairing()).launch();
+    rocket::ignite().mount("/", routes![scripts::file,get::index,get::stats, get::add]).attach(Template::fairing()).launch();
 }

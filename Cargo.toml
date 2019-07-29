@@ -25,7 +25,7 @@ rocket_contrib = { version = "0.4.2", default-features = false, features = ["ter
 # Windows API and interfaces
 winapi = "0.3.7"
 # wmi = "0.4.4"
-wmi = { version = "0.4.4", path = "../wmi" }
+wmi = { version = "0.4.4", path = "../wmi-rs" }
 
 # database
 diesel = { version = "1.4.2", features = ["postgres"] }

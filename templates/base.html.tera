@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+		<meta name=viewport content="width=device-width,initial-scale=1">
+		<meta http-equiv=X-UA-Compatible content="ie=edge">
+		<meta name=author content="Rick Benson">
+		<title>Server Tools</title>
+		<link rel="stylesheet" href="/scripts/css/servertools.css">
+		<link rel="icon" href="../favicon.ico">
+		<script src="/scripts/js/Chart.bundle.min.js"></script>
+		<script src="/scripts/js/Chart.RadialGauge.umd.js"></script>
+		<script src="/scripts/js/utils.js"></script> 
+    </head>
+    <body>
+        <div class="w3-bar w3-light-gray">
+            <div class="w3-button">
+                <b>ServerTools</b>
+            </div>
+        </div>
+
+        <div class="w3-content">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </body>
+</html>
