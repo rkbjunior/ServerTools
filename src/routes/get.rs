@@ -1,63 +1,15 @@
-extern crate rocket;
-
+use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 use tera::Context;
-use wmi::{COMLibrary, WMIConnection, WMIDateTime};
-use serde::Deserialize;
-use serde::Serialize;
-use rocket_contrib::json::Json;
+use wmi::{COMLibrary, WMIConnection};
+
 use std::collections::HashMap;
 
-/// Struct that stores operating system information from a wmi call.
-#[derive(Deserialize, Debug)]
-#[serde(rename = "Win32_OperatingSystem")]
-#[serde(rename_all = "PascalCase")]
-struct OperatingSystem {
-	caption: String,				//os_name
-	buildnumber: String,			//build
-	debug: bool,
-	last_boot_up_time: WMIDateTime,	//last_boot
-	csname: String,					//comp_name
-	description: String,			//desc
-	freephysicalmemory: String,		//free_mem
-	installdate: WMIDateTime,		//installdate
-	localdatetime: WMIDateTime,		//local_date
-	numberofprocesses: u32,			//num_of_processes
-	numberofusers: u32,				//num_of_users
-	operatingsystemsku: u32,		//sku
-	osarchitecture: String,			//architecture
-	total_visible_memory_size: String,	//total_mem
-}
-
-/// Struct that stores cpu information from a wmi call.
-#[derive(Deserialize, Debug)]
-#[serde(rename = "Win32_PerfFormattedData_Counters_ProcessorInformation")]
-#[serde(rename_all = "PascalCase")]
-struct ProcessUtilization {
-	percent_processor_time: String
-}
-
-/// Struct that stores current pc statistics
-/// * `freemem` - A value the represents the computers free memory.
-/// * `totalmem` - A value that represents the computers total memory.
-/// * `usedmem` - A value that represents the amount of memory in use.
-/// * `cpuu` - A value that represents the current cpu utilization.
-#[derive(Serialize, Deserialize)]
-pub struct Stats {
-	osname: String,
-	osbuild: String,
-	arch: String,
-	install: String,
-	lastboot: String,
-	compname: String,
-	freemem : f64,
-	totalmem: f64,
-	usedmem: f64,
-	cpuu: u64
-}
+use crate::wmiqueries::query_structs;
 
 const GIGACONVERSION: f64 = 1048576.0;
 const MEGACONVERSION: f64 = 1024.0;
+
 
 /// Converts a float that represents memory in bytes to MegaBytes or Gigabytes depending on the passed in paramaters.
 fn convert_memory_units(mut number: f64, scale: String) -> f64 {
@@ -82,7 +34,7 @@ fn round_decimals(mut number: f64, decimal_places: u64) -> f64 {
 	number
 }
 
-fn get_stats() -> Option<Stats> {
+fn get_stats() -> Option<query_structs::Stats> {
 
 	//WMI crate fails to get com connection sometimes, not sure why, but i loop
 	//here until I get back a good connection until I can figure this out.
@@ -106,8 +58,8 @@ fn get_stats() -> Option<Stats> {
 		if wmiresult.is_ok() {
 			_wmi_con = wmiresult.unwrap();
 
-			let mut osinfo: Vec<OperatingSystem> = Vec::new();
-			let mut cpuinfo: Vec<ProcessUtilization> = Vec::new();
+			let mut osinfo: Vec<query_structs::OperatingSystem> = Vec::new();
+			let mut cpuinfo: Vec<query_structs::ProcessUtilization> = Vec::new();
 			let osresults = _wmi_con.query();
 			let cpuresults = _wmi_con.query();
 
@@ -148,7 +100,7 @@ fn get_stats() -> Option<Stats> {
 
 			let usedmem = round_decimals( totalmem - freemem, 2);
 
-			return Some(Stats {
+			return Some(query_structs::Stats {
 				osname: osinfo[0].caption.clone(),
 				osbuild: osinfo[0].buildnumber.clone(),
 				arch: osinfo[0].osarchitecture.clone(),
@@ -213,14 +165,14 @@ pub fn add() -> Template {
 /// Route for ajax call to dynamically update the html page with new data at a specific interval.
 /// Uses wmi connection to obtain most recent data and returns the data as a JSON string using serde Serialize.
 #[get("/stats", format = "application/json")]
-pub fn stats() -> Json<Stats> {
+pub fn stats() -> Json<query_structs::Stats> {
 	
 	let res = get_stats();
 	let json_string;
 
 	match res {
 		Some(value) => {
-			json_string = Stats {
+			json_string = query_structs::Stats {
 				osname: value.osname,
 				osbuild: value.osbuild,
 				arch: value.arch,
@@ -234,7 +186,7 @@ pub fn stats() -> Json<Stats> {
 			};
 		}
 		None => {
-			json_string = Stats {
+			json_string = query_structs::Stats {
 				osname: "Err".to_string(),
 				osbuild: "Err".to_string(),
 				arch: "Err".to_string(),
