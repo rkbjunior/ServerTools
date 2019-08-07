@@ -1,162 +1,35 @@
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
 use tera::Context;
-use wmi::{COMLibrary, WMIConnection};
 
 use std::collections::HashMap;
 
-use crate::wmiqueries::query_structs;
-
-const GIGACONVERSION: f64 = 1048576.0;
-const MEGACONVERSION: f64 = 1024.0;
-
-
-/// Converts a float that represents memory in bytes to MegaBytes or Gigabytes depending on the passed in paramaters.
-fn convert_memory_units(mut number: f64, scale: String) -> f64 {
-	if scale == "MB".to_string() {
-		number /= MEGACONVERSION;
-	}
-
-	if scale == "GB".to_string() {
-		number /= GIGACONVERSION;
-	}
-
-	number
-}
-
-/// Trims a float to a specified number of decimal places.
-fn round_decimals(mut number: f64, decimal_places: u64) -> f64 {
-	let base: f64 = 10.0;
-	let decimal_places = base.powf(decimal_places as f64);
-
-	number = (number * decimal_places).round() / decimal_places;
-
-	number
-}
-
-fn get_stats() -> Option<query_structs::Stats> {
-
-	//WMI crate fails to get com connection sometimes, not sure why, but i loop
-	//here until I get back a good connection until I can figure this out.
-	let mut comresult = COMLibrary::new();
-	let mut i = 0;
-	while !comresult.is_ok() && i < 500 {
-		comresult = COMLibrary::new();
-		i += 1;
-	}
-
-	let _com_con;
-
-	//comresult should be okay, but lets check it anyway
-	if comresult.is_ok() {
-		_com_con = comresult.unwrap();
-
-		let wmiresult = WMIConnection::new(_com_con.into());
-		let _wmi_con;
-
-		//check that th wmi connection was okay
-		if wmiresult.is_ok() {
-			_wmi_con = wmiresult.unwrap();
-
-			let mut osinfo: Vec<query_structs::OperatingSystem> = Vec::new();
-			let mut cpuinfo: Vec<query_structs::ProcessUtilization> = Vec::new();
-			let osresults = _wmi_con.query();
-			let cpuresults = _wmi_con.query();
-
-			//Check that our queries worked okay
-			if osresults.is_ok() {
-				osinfo = osresults.unwrap()
-			} else {
-				println!("WMI OS Query Failed.");
-			}
-
-			if cpuresults.is_ok() {
-				cpuinfo = cpuresults.unwrap();
-			} else {
-				println!("WMI CPU Query Failed.");
-			}
-	
-			let freemem = round_decimals (
-				convert_memory_units (
-					osinfo[0].freephysicalmemory
-					.clone()
-					.parse::<f64>()
-					.unwrap()
-					,"GB".to_string()
-				)
-				, 2
-			);
-
-			let totalmem = round_decimals (
-				convert_memory_units (
-					osinfo[0].total_visible_memory_size
-					.clone()
-					.parse::<f64>()
-					.unwrap()
-					,"GB".to_string()
-				)
-				, 2
-			);
-
-			let usedmem = round_decimals( totalmem - freemem, 2);
-
-			return Some(query_structs::Stats {
-				osname: osinfo[0].caption.clone(),
-				osbuild: osinfo[0].buildnumber.clone(),
-				arch: osinfo[0].osarchitecture.clone(),
-				install: osinfo[0].installdate.0.to_rfc3339(),
-				lastboot: osinfo[0].last_boot_up_time.0.to_rfc3339(),	
-				compname: osinfo[0].csname.clone(),
-				freemem: freemem,
-				totalmem: totalmem,
-				usedmem: usedmem,
-				cpuu: cpuinfo[0].percent_processor_time.parse::<u64>().unwrap()
-			});
-		}
-		return None;
-	}
-	return None;
-}
+use lib;
 
 /// Route the returns a tera template, populating it with program variables gathered from wmi calls.
 #[get("/")]
 pub fn index() -> Template {
 
-	let res = get_stats();
+	let res = lib::get_stats2();
 	let mut context = Context::new();
 
-	match res {
-		Some(value) => {
-			context.insert("os_name", &value.osname);
-			context.insert("build", &value.osbuild);
-			context.insert("last_boot", &value.lastboot);
-			context.insert("comp_name", &value.compname);
-			context.insert("free_mem", &value.freemem);
-			context.insert("used_mem", &value.usedmem);
-			context.insert("installdate", &value.install);
-			context.insert("architecture", &value.arch);
-			context.insert("total_mem", &value.totalmem);
-			context.insert("cpu_utilization", &value.cpuu);
-		}
-		None => {
-			context.insert("os_name", "ERR");
-			context.insert("build", "ERR");
-			context.insert("last_boot", "ERR");
-			context.insert("comp_name", "ERR");
-			context.insert("free_mem", "ERR");
-			context.insert("used_mem", "ERR");
-			context.insert("installdate", "ERR");
-			context.insert("architecture", "ERR");
-			context.insert("total_mem", "ERR");
-			context.insert("cpu_utilization", "ERR");
-		}
-	}
+	context.insert("os_name", &res.osname);
+	context.insert("build", &res.osbuild);
+	context.insert("last_boot", &res.lastboot);
+	context.insert("comp_name", &res.compname);
+	context.insert("free_mem", &res.freemem);
+	context.insert("used_mem", &res.usedmem);
+	context.insert("installdate", &res.install);
+	context.insert("architecture", &res.arch);
+	context.insert("total_mem", &res.totalmem);
+	context.insert("cpu_utilization", &res.cpuu);
 
 	Template::render("layout", &context)
 }
 
 #[get("/add")]
 pub fn add() -> Template {
+
 	let context = HashMap::<String, String>::new();
 
 	Template::render("add",context)
@@ -165,41 +38,9 @@ pub fn add() -> Template {
 /// Route for ajax call to dynamically update the html page with new data at a specific interval.
 /// Uses wmi connection to obtain most recent data and returns the data as a JSON string using serde Serialize.
 #[get("/stats", format = "application/json")]
-pub fn stats() -> Json<query_structs::Stats> {
+pub fn stats() -> Json<lib::wmiqueries::query_structs::Stats> {
 	
-	let res = get_stats();
-	let json_string;
+	let res: lib::wmiqueries::query_structs::Stats = lib::get_stats2();
 
-	match res {
-		Some(value) => {
-			json_string = query_structs::Stats {
-				osname: value.osname,
-				osbuild: value.osbuild,
-				arch: value.arch,
-				install: value.install,
-				lastboot: value.lastboot,	
-				compname: value.compname,
-				freemem: value.freemem,
-				totalmem: value.totalmem,
-				usedmem: value.usedmem,
-				cpuu: value.cpuu
-			};
-		}
-		None => {
-			json_string = query_structs::Stats {
-				osname: "Err".to_string(),
-				osbuild: "Err".to_string(),
-				arch: "Err".to_string(),
-				install: "".to_string(),
-				lastboot: "".to_string(),	
-				compname: "Err".to_string(),
-				freemem: 0.0,
-				totalmem: 0.0,
-				usedmem: 0.0,
-				cpuu: 0
-			};
-		}
-	}
-
-	Json(json_string)
+	Json(res)
 }

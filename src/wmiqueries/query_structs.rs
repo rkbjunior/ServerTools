@@ -3,22 +3,24 @@ use serde::Deserialize;
 use serde::Serialize;
 
 /// Struct that stores operating system information from a wmi call.
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug,Clone)]
 #[serde(rename = "Win32_OperatingSystem")]
 #[serde(rename_all = "PascalCase")]
 pub struct OperatingSystem {
 	pub caption: String,				//os_name
 	pub buildnumber: String,			//build
-	pub last_boot_up_time: WMIDateTime,	//last_boot
+	pub last_boot_up_time: String,	//last_boot
 	pub csname: String,					//comp_name
 	pub freephysicalmemory: String,		//free_mem
-	pub installdate: WMIDateTime,		//installdate
+	pub installdate: String,		//installdate
 	pub osarchitecture: String,			//architecture
 	pub total_visible_memory_size: String,	//total_mem
 }
 
+
+
 /// Struct that stores cpu information from a wmi call.
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename = "Win32_PerfFormattedData_Counters_ProcessorInformation")]
 #[serde(rename_all = "PascalCase")]
 pub struct ProcessUtilization {
@@ -75,4 +77,51 @@ pub struct Stats {
 	pub totalmem: f64,
 	pub usedmem: f64,
 	pub cpuu: u64
+}
+
+impl Stats {
+	pub fn new() -> Stats {
+		Stats {
+			osname: "".to_string(),
+			osbuild: "".to_string(),
+			arch: "".to_string(),
+			install: "".to_string(),
+			lastboot: "".to_string(),
+			compname: "".to_string(),
+			freemem : 0.0,
+			totalmem: 0.0,
+			usedmem: 0.0,
+			cpuu: 0,
+		}
+	}
+	pub fn set_cpu(&mut self, value: u64) {
+		self.cpuu = value;
+	}
+	pub fn set_osname(&mut self, value: String) {
+		self.osname = value;
+	}
+	pub fn set_osbuild(&mut self, value: String) {
+		self.osbuild = value;
+	}
+	pub fn set_arch(&mut self, value: String) {
+		self.arch = value;
+	}
+	pub fn set_install(&mut self, value: String) {
+		self.install = value;
+	}
+	pub fn set_lastboot(&mut self, value: String) {
+		self.lastboot = value;
+	}
+	pub fn set_compname(&mut self, value: String) {
+		self.compname = value;
+	}
+	pub fn set_freemem(&mut self, value: f64) {
+		self.freemem = value;
+	}
+	pub fn set_totalmem(&mut self, value: f64) {
+		self.totalmem = value;
+	}
+	pub fn set_usedmem(&mut self, value: f64) {
+		self.usedmem = value;
+	}
 }

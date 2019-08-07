@@ -6,11 +6,11 @@
 		<meta http-equiv=X-UA-Compatible content="ie=edge">
 		<meta name=author content="Rick Benson">
 		<title>Server Tools</title>
-		<link rel="stylesheet" href="/scripts/css/servertools.css">
+		<link rel="stylesheet" href="/static/css/servertools.css">
 		<link rel="icon" href="../favicon.ico">
-		<script src="/scripts/js/Chart.bundle.min.js"></script>
-		<script src="/scripts/js/Chart.RadialGauge.umd.js"></script>
-		<script src="/scripts/js/utils.js"></script> 
+		<script src="/static/js/Chart.bundle.min.js"></script>
+		<script src="/static/js/Chart.RadialGauge.umd.js"></script>
+		<script src="/static/js/utils.js"></script> 
     </head>
     <body>
         <div class="w3-bar w3-light-gray">

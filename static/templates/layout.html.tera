@@ -124,5 +124,5 @@
 		window.myRadialGauge2 = new Chart(ctx2, config2);
 	};
 </script>
-<script src="/scripts/js/main.js"></script>
+<script src="/static/js/main.js"></script>
 {% endblock content %} 
