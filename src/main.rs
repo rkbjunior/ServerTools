@@ -5,15 +5,17 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #[macro_use] extern crate rocket;
 
-mod routes;
-mod wmiqueries;
-use routes::{scripts, get };
+use lib::create_db_pool;
+
 use rocket_contrib::templates::Template;
 
+pub mod get;
+pub mod post;
 
 fn main() {
     rocket::ignite()
-		.mount("/", routes![scripts::file,get::index,get::stats, get::add])
+		.manage(create_db_pool())
+		.mount("/", routes![get::file,get::index,get::stats, get::add, post::add])
 		.attach(Template::fairing())
 		.launch();
 }

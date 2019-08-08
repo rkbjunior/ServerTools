@@ -1,4 +1,4 @@
-use wmi::{WMIDateTime};
+use wmi::WMIDateTime;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -16,8 +16,6 @@ pub struct OperatingSystem {
 	pub osarchitecture: String,			//architecture
 	pub total_visible_memory_size: String,	//total_mem
 }
-
-
 
 /// Struct that stores cpu information from a wmi call.
 #[derive(Deserialize, Debug, Clone)]
@@ -65,7 +63,7 @@ pub struct Win32Service {
 /// * `totalmem` - A value that represents the computers total memory.
 /// * `usedmem` - A value that represents the amount of memory in use.
 /// * `cpuu` - A value that represents the current cpu utilization.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Stats {
 	pub osname: String,
 	pub osbuild: String,
@@ -94,6 +92,7 @@ impl Stats {
 			cpuu: 0,
 		}
 	}
+
 	pub fn set_cpu(&mut self, value: u64) {
 		self.cpuu = value;
 	}

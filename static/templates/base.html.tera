@@ -10,7 +10,8 @@
 		<link rel="icon" href="../favicon.ico">
 		<script src="/static/js/Chart.bundle.min.js"></script>
 		<script src="/static/js/Chart.RadialGauge.umd.js"></script>
-		<script src="/static/js/utils.js"></script> 
+		<script src="/static/js/utils.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
     </head>
     <body>
         <div class="w3-bar w3-light-gray">

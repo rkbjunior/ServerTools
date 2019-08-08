@@ -1,18 +1,34 @@
-pub mod wmiqueries;
+#[macro_use] extern crate diesel;
+use diesel::prelude::*;
+
+use dotenv::dotenv;
+
+use r2d2::{Pool, PooledConnection};
+use r2d2_diesel::ConnectionManager;
+
+use rocket::{Outcome, Request, State};
+use rocket::http::Status;
+use rocket::request::{self, FromRequest};
+
+use std::env;
+use std::ops::Deref;
 
 use wmi::{COMLibrary, WMIConnection};
-use crate::wmiqueries::query_structs;
 
-const GIGACONVERSION: f64 = 1048576.0;
+pub mod models;
+pub mod query_structs;
+pub mod schema;
+
+const GIGACONVERSION: f64 = 1_048_576.0;
 const MEGACONVERSION: f64 = 1024.0;
 
 /// Converts a float that represents memory in bytes to MegaBytes or Gigabytes depending on the passed in paramaters.
 pub fn convert_memory_units(mut number: f64, scale: String) -> f64 {
-	if scale == "MB".to_string() {
+	if scale == "MB" {
 		number /= MEGACONVERSION;
 	}
 
-	if scale == "GB".to_string() {
+	if scale == "GB" {
 		number /= GIGACONVERSION;
 	}
 
@@ -84,7 +100,7 @@ pub fn get_os() -> Option<query_structs::OperatingSystem> {
 	None
 }
 
-pub fn get_stats2() -> wmiqueries::query_structs::Stats {
+pub fn get_stats2() -> query_structs::Stats {
 	let cpu = get_cpu();
 
 	//let osinfo;
@@ -140,66 +156,33 @@ pub fn get_stats2() -> wmiqueries::query_structs::Stats {
 	stats
 }
 
-//pub fn get_stats() -> Option<query_structs::Stats> {
-//	let wmi_con = get_wmi_connection();
+pub fn create_db_pool() -> Pool<ConnectionManager<PgConnection>> {
+    dotenv().ok();
 
-//	if wmi_con.is_ok() {
-//		let osquery = wmi_con.unwrap().query();
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
 
-//		if osquery.is_ok() {
-//			let osinfo: Vec<query_structs::OperatingSystem> = osquery.unwrap();
+    Pool::new(manager).expect("Failed to create pool.")
+}
 
-//			let freemem = round_decimals (
-//				convert_memory_units (
-//					osinfo[0].freephysicalmemory
-//					.clone()
-//					.parse::<f64>()
-//					.unwrap()
-//					,"GB".to_string()
-//				)
-//				, 2
-//			);
+pub struct DbConn(PooledConnection<ConnectionManager<PgConnection>>);
 
-//			let totalmem = round_decimals (
-//				convert_memory_units (
-//					osinfo[0].total_visible_memory_size
-//					.clone()
-//					.parse::<f64>()
-//					.unwrap()
-//					,"GB".to_string()
-//				)
-//				, 2
-//			);
+impl<'a, 'r> FromRequest<'a, 'r> for DbConn {
+    type Error = ();
 
-//			let usedmem = round_decimals( totalmem - freemem, 2);
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<DbConn, ()> {
+        let pool = request.guard::<State<Pool<ConnectionManager<PgConnection>>>>()?;
+        match pool.get() {
+            Ok(conn) => Outcome::Success(DbConn(conn)),
+            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
+        }
+    }
+}
 
-//			let wmi_com = get_wmi_connection();
+impl Deref for DbConn {
+    type Target = PgConnection;
 
-//			if wmi_com.is_ok() {
-//				let cpuquery = wmi_con.unwrap().query();
-
-//				if cpuquery.is_ok() {
-//					let cpuinfo: Vec<query_structs::ProcessUtilization> = cpuquery.unwrap();
-
-//					return Some(query_structs::Stats {
-//						osname: osinfo[0].caption.clone(),
-//						osbuild: osinfo[0].buildnumber.clone(),
-//						arch: osinfo[0].osarchitecture.clone(),
-//						install: osinfo[0].installdate.0.to_rfc3339(),
-//						lastboot: osinfo[0].last_boot_up_time.0.to_rfc3339(),	
-//						compname: osinfo[0].csname.clone(),
-//						freemem: freemem,
-//						totalmem: totalmem,
-//						usedmem: usedmem,
-//						cpuu: cpuinfo[0].percent_processor_time.parse::<u64>().unwrap()
-//					});
-//				}
-//			}
-
-
-
-//		}
-//		return None;
-//	}
-//	None
-//}
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}

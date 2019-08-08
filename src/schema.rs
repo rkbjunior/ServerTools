@@ -1,5 +1,6 @@
-extern crate dotenve;
-use dotenv::dotenv;
-use std::env;
-
-infer_schema!("dotenv:DATABASE_URL");
+table! {
+    remote_servers (servername) {
+        servername -> Varchar,
+        ip_address -> Varchar,
+    }
+}

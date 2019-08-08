@@ -4,5 +4,48 @@
 <h1>Servers</h1>
 <p>
     Server List
+	<br>
+	<div>
+		{% for server in servers %}
+			<p>{{ server.server_name}} {{server.ip_address}}</p>
+		{% endfor %}
+	</div>
 </p>
+
+<p>
+<a href="" class="registerbutton">Register New Server</a>
+<div id="modalbackground" style="display: none;"></div>
+<div id="registrationformdiv" class="registered-form-div" style="display: none;">
+<h3>Serial Registration Form&nbsp;<a href="" id="cancelserialregistrationform" class="cancelform" title="cancel serial registration">x</a></h3>
+<div id="addserialinstructions">Enter a serial number to be registered.</div>
+	<form action="/add" method="post">
+		<label for="servername">Server Name</label>
+		<input name="servername" type="text">
+		<label for="serverip">Server IP</label>
+		<input name="ipaddress" type="text">
+		<input type="submit" value="Add">
+	</form>
+</div>
+</p>
+
+<script>
+	$(document).ready(function() {
+	//cancel serial registration form
+		$("#cancelserverform").click(function(){
+			$("#serverformdiv").fadeOut("slow");
+			$("#modalbackground").fadeOut("slow");
+		});     
+	});
+</script>
+<script>
+	$(document).ready(function()  {
+		$(".registerbutton").click(function(){
+		$("#modalbackground").fadeIn("slow");
+		$("#registrationformdiv").fadeIn("slow");
+		$("#modalbackground").fadeIn("slow");
+
+		return false;
+		});
+	});
+</script>
 {% endblock content %} 
