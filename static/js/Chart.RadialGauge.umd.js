@@ -1,3 +1,5 @@
+/* https://github.com/pandameister/chartjs-chart-radial-gauge */
+
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('chart.js')) :
   typeof define === 'function' && define.amd ? define(['chart.js'], factory) :

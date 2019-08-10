@@ -1,24 +1,42 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8" />
-		<meta name=viewport content="width=device-width,initial-scale=1">
-		<meta http-equiv=X-UA-Compatible content="ie=edge">
-		<meta name=author content="Rick Benson">
-		<title>Server Tools</title>
-		<link rel="stylesheet" href="/static/css/servertools.css">
-		<link rel="icon" href="../favicon.ico">
-		<script src="/static/js/Chart.bundle.min.js"></script>
-		<script src="/static/js/Chart.RadialGauge.umd.js"></script>
-		<script src="/static/js/utils.js"></script>
-    <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+      <meta charset="utf-8" />
+		  <meta name="viewport" content="width=device-width,initial-scale=1" />
+		  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		  <meta name="author" content="Rick Benson" />
+		  <title>Server Tools</title>
+		  <link rel="stylesheet" href="/static/css/servertools.css" />
+      <link rel="stylesheet" href="/static/css/notices.css" />
+      <link rel="stylesheet" href="/static/css/navbar.css" />
+		  <link rel="icon" href="../favicon.ico" />
+		  <script src="/static/js/Chart.bundle.min.js"></script>
+		  <script src="/static/js/Chart.RadialGauge.umd.js"></script>
+		  <script src="/static/js/utils.js"></script>
+      <script type="text/javascript" src="/static/js/jquery-3.4.1.min.js"></script>
     </head>
     <body>
-        <div class="w3-bar w3-light-gray">
             <div class="w3-button">
                 <b>ServerTools</b>
             </div>
-        </div>
+            <div class="navbar">
+              <ul>
+			    <li>
+                  <a href="/">Home</a>
+                </li>
+                <li>
+                  <a href="/add">Manage Servers</a>
+                </li>
+                <li class="dropdown">
+                  <a href="javascript:void(0)" class="dropbtn">Servers</a>
+                  <div class="dropdown-content">
+                    {% for server in servers %}
+                      <a href="/{{ server.server_name}}">{{server.server_name}}</a>
+                    {% endfor %}
+                  </div>
+                </li>
+              </ul>
+            </div>
 
         <div class="w3-content">
             {% block content %}

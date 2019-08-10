@@ -1,14 +1,32 @@
 {% extends "base" %}
 
 {% block content %}
-<h1>Servers</h1>
+<h1>Registered Servers</h1>
 <p>
-    Server List
-	<br>
-	<div>
-		{% for server in servers %}
-			<p>{{ server.server_name}} {{server.ip_address}}</p>
-		{% endfor %}
+    <div id="notice" class="{{ class }}"><p>{{ message }}</p></div>
+	<div class="rTable">
+		<div class="rTableHeading">
+			<div class="rTableRow">
+				<div class="rTableHead">Server Name</div>
+				<div class="rTableHead">Ip Address</div>
+				<div class="rTableHead">Remove</div>
+			</div>
+		</div>
+		<div class="rTableBody">
+			{% for server in servers %}
+				<div id="{{server.server_name}}-div" class="rTableRow">
+					<div class="rTableCell">
+						{{ server.server_name}}
+					</div>
+					<div class="rTableCell">
+						{{server.ip_address}}
+					</div>
+					<div class="rTableCell">
+						<button id="{{server.server_name}}-btn" onclick="deregister('{{server.server_name}}')">Remove</button>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
 	</div>
 </p>
 
@@ -47,5 +65,27 @@
 		return false;
 		});
 	});
+</script>
+<script>
+	function deregister(name) {
+		$(document).ready(function() {
+			$.ajax({
+				url: "/remove/" + name,
+				type:"POST",
+				success: function(result){
+					if(result == "1 row(s) were deleted.") {
+						result = "<p>" + result + "</p>";
+						$("#notice").attr('class', 'notice success');
+						$("#notice").html(result);
+						$("#"+name + "-div").remove();
+					}
+					console.log(result)
+				},
+				error:function(error){
+					console.log(`Error ${error}`)
+				}
+			})
+		});
+	}
 </script>
 {% endblock content %} 

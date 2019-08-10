@@ -5,7 +5,7 @@
 	<div class="column">
 		<section class="container">
 			<div>
-				<h1>{{comp_name}}</h1>
+				<h1 id="context">{{comp_name}}</h1>
 				<hr>
 			</div>
 		</section>

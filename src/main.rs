@@ -15,7 +15,7 @@ pub mod post;
 fn main() {
     rocket::ignite()
 		.manage(create_db_pool())
-		.mount("/", routes![get::file,get::index,get::stats, get::add, post::add])
+		.mount("/", routes![get::file,get::index,get::stats, get::add, post::add,post::remove,get::server,get::stats_by_name])
 		.attach(Template::fairing())
 		.launch();
 }

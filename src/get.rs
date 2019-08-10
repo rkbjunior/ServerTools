@@ -1,23 +1,20 @@
 use lib::*;
 use lib::models::*;
-
 use diesel;
 use diesel::prelude::*;
-
-
 use rocket::response::NamedFile;
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
-
 use std::path::{Path, PathBuf};
-
 use tera::Context;
 
-/// Route the returns a tera template, populating it with program variables gathered from wmi calls.
 #[get("/")]
-pub fn index() -> Template {
+pub fn index(connection: DbConn) -> Template {
+	use schema::remote_servers::dsl::*;
 
-	let res = lib::get_stats2();
+	//get the name of the first registered server use none if none.
+	let host = None;
+	let res = lib::get_stats2(host);
 	let mut context = Context::new();
 
 	context.insert("os_name", &res.osname);
@@ -31,6 +28,36 @@ pub fn index() -> Template {
 	context.insert("total_mem", &res.totalmem);
 	context.insert("cpu_utilization", &res.cpuu);
 
+	let servers_list = remote_servers.load::<Server>(&*connection).expect("Error Loading Servers");
+
+	context.insert("servers", &servers_list);
+
+	Template::render("layout", &context)
+}
+
+#[get("/<name>")]
+pub fn server(connection: DbConn, name: String) -> Template {
+	use schema::remote_servers::dsl::*;
+
+	//get the name of the first registered server use none if none.
+	let host = Some(name);
+	let res = lib::get_stats2(host);
+	let mut context = Context::new();
+
+	context.insert("os_name", &res.osname);
+	context.insert("build", &res.osbuild);
+	context.insert("last_boot", &res.lastboot);
+	context.insert("comp_name", &res.compname);
+	context.insert("free_mem", &res.freemem);
+	context.insert("used_mem", &res.usedmem);
+	context.insert("installdate", &res.install);
+	context.insert("architecture", &res.arch);
+	context.insert("total_mem", &res.totalmem);
+	context.insert("cpu_utilization", &res.cpuu);
+
+	let servers_list = remote_servers.load::<Server>(&*connection).expect("Error Loading Servers");
+	context.insert("servers", &servers_list);
+
 	Template::render("layout", &context)
 }
 
@@ -40,7 +67,10 @@ pub fn add(connection: DbConn) -> Template {
 
 	let mut context = Context::new();
 	let servers_list = remote_servers.load::<Server>(&*connection).expect("Error Loading Servers");
+
 	context.insert("servers", &servers_list);
+	context.insert("class","hidenotice");
+	context.insert("message","Nothing to see here, move along...");
 
 	Template::render("add",context)
 }
@@ -49,9 +79,17 @@ pub fn add(connection: DbConn) -> Template {
 /// Uses wmi connection to obtain most recent data and returns the data as a JSON string using serde Serialize.
 #[get("/stats", format = "application/json")]
 pub fn stats() -> Json<lib::query_structs::Stats> {
-	
-	let res: lib::query_structs::Stats = lib::get_stats2();
+	let host = None;
 
+	let res: lib::query_structs::Stats = lib::get_stats2(host);
+	Json(res)
+}
+
+#[get("/stats/<name>", format = "application/json")]
+pub fn stats_by_name(name: String) -> Json<lib::query_structs::Stats> {
+	let host = Some(name);
+
+	let res: lib::query_structs::Stats = lib::get_stats2(host);
 	Json(res)
 }
 
@@ -60,5 +98,4 @@ pub fn file(file: PathBuf, sub_folder: String) -> Option<NamedFile> {
 
 	let path = format!("static/{}/", sub_folder);
 	NamedFile::open(Path::new(&path).join(file)).ok()
-
 }

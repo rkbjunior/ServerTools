@@ -1,18 +1,13 @@
 #[macro_use] extern crate diesel;
 use diesel::prelude::*;
-
 use dotenv::dotenv;
-
 use r2d2::{Pool, PooledConnection};
 use r2d2_diesel::ConnectionManager;
-
 use rocket::{Outcome, Request, State};
 use rocket::http::Status;
 use rocket::request::{self, FromRequest};
-
 use std::env;
 use std::ops::Deref;
-
 use wmi::{COMLibrary, WMIConnection};
 
 pub mod models;
@@ -45,7 +40,7 @@ pub fn round_decimals(mut number: f64, decimal_places: u64) -> f64 {
 	number
 }
 
-pub fn get_wmi_connection() -> Result<WMIConnection,String> {
+pub fn get_wmi_connection(host: Option<String>) -> Result<WMIConnection,String> {
 
 	//WMI crate fails to get com connection sometimes, not sure why, but i loop
 	//here until I get back a good connection until I can figure this out.
@@ -54,8 +49,8 @@ pub fn get_wmi_connection() -> Result<WMIConnection,String> {
 	//comresult should be okay, but lets check it anyway
 	if comresult.is_ok() {
 		let com_con = comresult.unwrap();
-		let wmi_con = WMIConnection::new(com_con.into());
-
+		let wmi_con = WMIConnection::new(com_con.into(), host);
+		
 		//check that th wmi connection was okay
 		if wmi_con.is_ok() {
 			return Ok(wmi_con.unwrap());
@@ -67,12 +62,12 @@ pub fn get_wmi_connection() -> Result<WMIConnection,String> {
 	Err("Comm library connection failed.".to_string())
 }
 
-pub fn get_cpu() -> Option<query_structs::ProcessUtilization> {
-	let wmi_con = get_wmi_connection();
+pub fn get_cpu(host: Option<String>) -> Option<query_structs::ProcessUtilization> {
+	let wmi_con = get_wmi_connection(host);
+
 
 	if wmi_con.is_ok() {
 		let query = wmi_con.unwrap().query();
-
 		if query.is_ok() {
 			let info: Vec<query_structs::ProcessUtilization> = query.unwrap();
 			return Some(info[0].clone());
@@ -80,12 +75,12 @@ pub fn get_cpu() -> Option<query_structs::ProcessUtilization> {
 		}
 		return None;
 	}
-
+	
 	None
 }
 
-pub fn get_os() -> Option<query_structs::OperatingSystem> {
-	let wmi_con = get_wmi_connection();
+pub fn get_os(host: Option<String>) -> Option<query_structs::OperatingSystem> {
+	let wmi_con = get_wmi_connection(host);
 
 	if wmi_con.is_ok() {
 		let query = wmi_con.unwrap().query();
@@ -100,11 +95,11 @@ pub fn get_os() -> Option<query_structs::OperatingSystem> {
 	None
 }
 
-pub fn get_stats2() -> query_structs::Stats {
-	let cpu = get_cpu();
+pub fn get_stats2(host_name: Option<String>) -> query_structs::Stats {
+	let cpu = get_cpu(host_name.clone());
 
 	//let osinfo;
-	let osinfo = get_os();
+	let osinfo = get_os(host_name.clone());
 
 	let mut stats = query_structs::Stats::new();
 
