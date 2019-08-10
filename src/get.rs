@@ -14,6 +14,7 @@ pub fn index(connection: DbConn) -> Template {
 
 	//get the name of the first registered server use none if none.
 	let host = None;
+		println!("Calling / stats2");
 	let res = lib::get_stats2(host);
 	let mut context = Context::new();
 
@@ -35,12 +36,13 @@ pub fn index(connection: DbConn) -> Template {
 	Template::render("layout", &context)
 }
 
-#[get("/<name>")]
+#[get("/servers/<name>")]
 pub fn server(connection: DbConn, name: String) -> Template {
 	use schema::remote_servers::dsl::*;
 
 	//get the name of the first registered server use none if none.
 	let host = Some(name);
+	println!("Calling /<name> stats2");
 	let res = lib::get_stats2(host);
 	let mut context = Context::new();
 
@@ -77,18 +79,18 @@ pub fn add(connection: DbConn) -> Template {
 
 /// Route for ajax call to dynamically update the html page with new data at a specific interval.
 /// Uses wmi connection to obtain most recent data and returns the data as a JSON string using serde Serialize.
-#[get("/stats", format = "application/json")]
-pub fn stats() -> Json<lib::query_structs::Stats> {
-	let host = None;
+//#[get("/stats", format = "application/json")]
+//pub fn stats() -> Json<lib::query_structs::Stats> {
+	//let host = None;
 
-	let res: lib::query_structs::Stats = lib::get_stats2(host);
-	Json(res)
-}
+	//let res: lib::query_structs::Stats = lib::get_stats2(host);
+	//Json(res)
+//}
 
 #[get("/stats/<name>", format = "application/json")]
 pub fn stats_by_name(name: String) -> Json<lib::query_structs::Stats> {
 	let host = Some(name);
-
+		println!("Calling /stats/<name> stats2");
 	let res: lib::query_structs::Stats = lib::get_stats2(host);
 	Json(res)
 }

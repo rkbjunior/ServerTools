@@ -31,7 +31,7 @@
                   <a href="javascript:void(0)" class="dropbtn">Servers</a>
                   <div class="dropdown-content">
                     {% for server in servers %}
-                      <a href="/{{ server.server_name}}">{{server.server_name}}</a>
+                      <a href="/servers/{{ server.server_name}}">{{server.server_name}}</a>
                     {% endfor %}
                   </div>
                 </li>
