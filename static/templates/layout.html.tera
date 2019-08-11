@@ -71,7 +71,38 @@
 </div>
 
 <div id="Services" class="tabcontent">
-
+	<div class="rTable">
+		<div class="rTableHeading">
+			<div class="rTableRow">
+				<div class="rTableHead">Name</div>
+				<div class="rTableHead">PID</div>
+				<div class="rTableHead">Description</div>
+				<div class="rTableHead">Start Type</div>
+				<div class="rTableHead">Status</div>
+			</div>
+		</div>
+		<div class="rTableBody">
+			{% for service in win32service %}
+				<div id="{{service.Name}}-div" class="rTableRow">
+					<div class="rTableCell">
+						{{ service.Name}}
+					</div>
+					<div class="rTableCell">
+						{{service.ProcessId}}
+					</div>
+					<div class="rTableCell">
+						{{service.Description}}
+					</div>
+					<div class="rTableCell">
+						{{service.StartMode}}
+					</div>
+					<div class="rTableCell">
+						{{service.State}}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 </div>
 
 <script>

@@ -14,8 +14,11 @@ pub fn index(connection: DbConn) -> Template {
 
 	//get the name of the first registered server use none if none.
 	let host = None;
-		println!("Calling / stats2");
-	let res = lib::get_stats2(host);
+	println!("Calling / stats2");
+
+	let res = lib::get_stats2(host.clone());
+	let ser = lib::get_services(host.clone()).unwrap();
+
 	let mut context = Context::new();
 
 	context.insert("os_name", &res.osname);
@@ -32,7 +35,7 @@ pub fn index(connection: DbConn) -> Template {
 	let servers_list = remote_servers.load::<Server>(&*connection).expect("Error Loading Servers");
 
 	context.insert("servers", &servers_list);
-
+	context.insert("win32service", &ser);
 	Template::render("layout", &context)
 }
 
@@ -43,7 +46,8 @@ pub fn server(connection: DbConn, name: String) -> Template {
 	//get the name of the first registered server use none if none.
 	let host = Some(name);
 	println!("Calling /<name> stats2");
-	let res = lib::get_stats2(host);
+	let res = lib::get_stats2(host.clone());
+	let ser = lib::get_services(host.clone()).unwrap();
 	let mut context = Context::new();
 
 	context.insert("os_name", &res.osname);
@@ -59,7 +63,7 @@ pub fn server(connection: DbConn, name: String) -> Template {
 
 	let servers_list = remote_servers.load::<Server>(&*connection).expect("Error Loading Servers");
 	context.insert("servers", &servers_list);
-
+	context.insert("win32service", &ser);
 	Template::render("layout", &context)
 }
 

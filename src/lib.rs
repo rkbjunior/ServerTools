@@ -95,6 +95,25 @@ pub fn get_os(host: Option<String>) -> Option<query_structs::OperatingSystem> {
 	None
 }
 
+pub fn get_services(host: Option<String>) -> Option<Vec<query_structs::Win32Service>> {
+	let wmi_con = get_wmi_connection(host);
+	println!{"get services called wmi_con"};
+	if wmi_con.is_ok() {
+		let query = wmi_con.unwrap().query();
+		
+		if query.is_ok() {
+			println!{"query ok"};
+			let services: Vec<query_structs::Win32Service> = query.unwrap();
+
+			return Some(services);
+		}
+		println!{"{:?}",query};
+		return None;
+	}
+	None
+
+}
+
 pub fn get_stats2(host_name: Option<String>) -> query_structs::Stats {
 	let cpu = get_cpu(host_name.clone());
 

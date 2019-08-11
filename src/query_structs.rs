@@ -26,36 +26,16 @@ pub struct ProcessUtilization {
 }
 
 /// Struct that stores operating system information from a wmi call.
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename = "Win32_Service")]
 #[serde(rename_all = "PascalCase")]
 pub struct Win32Service {
-	pub AcceptPause: bool,
-	pub AcceptStop: bool,
-	pub Caption: String,
-	pub CheckPoint: u32,
-	pub CreationClassName: String,
-	pub DelayedAutoStart: bool,
-	pub Description: String,
-	pub DesktopInteract: bool,
-	pub DisplayName: String,
-	pub ErrorControl: String,
-	pub ExitCode: u32,
-	pub InstallDate: WMIDateTime,
-	pub Name: String,
-	pub PathName: String,
-	pub ProcessId: u32,
-	pub ServiceSpecificExitCode: u32,
-	pub ServiceType: String,
-	pub Started: bool,
-	pub StartMode: String,
-	pub StartName: String,
-	pub State: String,
-	pub Status: String,
-	pub SystemCreationClassname: String,
-	pub SystemName: String,
-	pub TagId: u32,
-	pub WaitHint: u32,
+	pub name: String,
+	pub display_name: String,
+	pub start_mode: String,
+	pub state: String,
+	pub process_id: u32,
+	pub description: Option<String>,
 }
 
 /// Struct that consolidates multiple wmi calls and stores current pc statistics
