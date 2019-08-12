@@ -4,17 +4,20 @@ Copyright (c) 2019 Richard Benson (rbenson@pdx.edu)
 This program is a web application written in rust that will use the winapi crate to query the state of windows servers (using windows API calls) and display various operating metrics of those servers.
 Including a list of services and their status.
 
-This web application is built on the nightly toolchain and is using nightly-2019-08-11
+This web application is built on the nightly toolchain and is using nightly-2019-08-10
 
 ## Build and Run
 Build this program with `cargo build --bin main`. You can run the program with `cargo run --bin main`.
+
+This web application uses a modified version of the wmi-rs crate. I created a fork for this crate and modified it to allow remote server connections. You will need to download my fork of the wmi-rs crate
+and add it to the directory above the ServerTools Crate.
 
 The web application will only work on windows machines that have the WMI services enabled. You may need to adjust your firewalls to permit WMI traffic.
 
 Be default the root of the webapplication will query the WMI services on the local host. After you register some remote servers on the same local area network,
 you should be able to view their wmi information as well, as long as their services are available. 
 
-Once the web application is up and running. Navigate your web browser to https://localhost:8000
+Once the web application is up and running. Navigate your web browser to http://localhost:8000
 
 
 ## Mentions
