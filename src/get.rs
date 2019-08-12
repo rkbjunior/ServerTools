@@ -34,14 +34,21 @@ pub fn index(connection: DbConn) -> Template {
 
     //Query wmi for machine info and services.
     let res = lib::get_stats(host.clone());
-    let ser = lib::get_services(host.clone()).unwrap();
+    let ser = lib::get_services(host.clone());
+	let mut context = Context::new();
+	let mut template_name = "layout".to_string();
+
+	match ser {
+		Some(s) => context.insert("win32service", &s),
+		None => template_name = "hosterror".to_string(),
+	}
 
     //Load the registered servers from the database.
     let servers_list = remote_servers
         .load::<Server>(&*connection)
         .expect("Error Loading Servers");
 
-    let mut context = Context::new();
+
 
     //Add the data to our template
     context.insert("os_name", &res.osname);
@@ -55,10 +62,9 @@ pub fn index(connection: DbConn) -> Template {
     context.insert("total_mem", &res.totalmem);
     context.insert("cpu_utilization", &res.cpuu);
     context.insert("servers", &servers_list);
-    context.insert("win32service", &ser);
 
     //Render the template
-    Template::render("layout", &context)
+    Template::render(template_name, &context)
 }
 
 /// GET route for a specific registered remote server. Matches /servers/<server_name>
@@ -89,14 +95,24 @@ pub fn server(connection: DbConn, name: String) -> Template {
 
     //Query wmi for machine info and services.
     let res = lib::get_stats(host.clone());
-    let ser = lib::get_services(host.clone()).unwrap();
+    let ser = lib::get_services(host.clone());
+	let mut context = Context::new();
+	let mut template_name = "layout".to_string();
+
+	match ser {
+		Some(s) => context.insert("win32service", &s),
+		None => template_name = "hosterror".to_string(),
+	}
+
+	//println!("{:?}",res);
+	//println!("{:?}",ser);
 
     //Load the registered servers from the database.
     let servers_list = remote_servers
         .load::<Server>(&*connection)
         .expect("Error Loading Servers");
 
-    let mut context = Context::new();
+
 
     //Add the data to our template
     context.insert("os_name", &res.osname);
@@ -110,10 +126,10 @@ pub fn server(connection: DbConn, name: String) -> Template {
     context.insert("total_mem", &res.totalmem);
     context.insert("cpu_utilization", &res.cpuu);
     context.insert("servers", &servers_list);
-    context.insert("win32service", &ser);
+    
 
     //Render the template
-    Template::render("layout", &context)
+    Template::render(template_name, &context)
 }
 
 /// GET route for the register server page. Matches /add.

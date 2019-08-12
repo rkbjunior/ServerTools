@@ -25,7 +25,7 @@ pub struct ProcessUtilization {
 }
 
 /// Struct that stores service information from a wmi call.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(rename = "Win32_Service")]
 #[serde(rename_all = "PascalCase")]
 pub struct Win32Service {
@@ -37,12 +37,27 @@ pub struct Win32Service {
     pub description: Option<String>,
 }
 
+/// Implements Stats
+impl Win32Service {
+    /// Default constructor for stats.
+    pub fn new() -> Win32Service {
+        Win32Service {
+            name: "".to_string(),
+            display_name: "".to_string(),
+            start_mode: "".to_string(),
+            state: "".to_string(),
+            description: Some("".to_string()),
+			process_id: 0,
+        }
+    }
+}
+
 /// Struct that consolidates multiple wmi calls and stores current pc statistics
 /// * `freemem` - A value the represents the computers free memory.
 /// * `totalmem` - A value that represents the computers total memory.
 /// * `usedmem` - A value that represents the amount of memory in use.
 /// * `cpuu` - A value that represents the current cpu utilization.
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Stats {
     pub osname: String,
     pub osbuild: String,

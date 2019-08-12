@@ -1,0 +1,7 @@
+{% extends "base" %}
+
+{% block content %}
+
+There was an error trying to contact the server you added. Check the hostname and make sure WMI is accessible.
+
+{% endblock content %} 

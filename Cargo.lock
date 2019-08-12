@@ -1179,7 +1179,7 @@ dependencies = [
 
 [[package]]
 name = "server_tools"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "diesel 1.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "diesel_infer_schema 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
